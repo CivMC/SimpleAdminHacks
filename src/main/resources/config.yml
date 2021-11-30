@@ -366,6 +366,7 @@ hacks:
     rainReduction:
       enabled: false
       rainOccurrenceChance: .5
+    allowVoxelMapCaveMode: false
   HorseStats:
     enabled: false
     wand: COMPASS
