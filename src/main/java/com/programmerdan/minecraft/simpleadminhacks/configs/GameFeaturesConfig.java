@@ -97,7 +97,7 @@ public class GameFeaturesConfig extends SimpleHackConfig {
 		if (this.disableNetheriteCrafting) plugin().log("  Disable Netherite Crafting enabled.");
 		
 		this.goldBlockTeleport = config.getBoolean("goldBlockTeleport", false);
-		if (this.personalDeathMessages) plugin().log("  Gold block teleporter enabled.");
+		if (this.goldBlockTeleport) plugin().log("  Gold block teleporter enabled.");
 
 		/* Add additional feature config grabs here. */
 	}
@@ -178,7 +178,7 @@ public class GameFeaturesConfig extends SimpleHackConfig {
 	}
 	
 	public boolean isGoldblockTeleport() {
-		return goldBlockTeleport;
+		return this.goldBlockTeleport;
 	}
 
 }

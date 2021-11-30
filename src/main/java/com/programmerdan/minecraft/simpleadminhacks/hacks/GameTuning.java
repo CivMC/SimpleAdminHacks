@@ -42,6 +42,7 @@ import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent.BedEnterResult;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -483,5 +484,12 @@ public class GameTuning extends SimpleHack<GameTuningConfig> implements Listener
 		return true;
 	}
 
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		if (!config.isEnabled() || config.allowVoxelMapCaveMode()) {
+			return;
+		}
+		event.getPlayer().sendMessage("§3 §6 §3 §6 §3 §6 §d ");
+	}
 
 }

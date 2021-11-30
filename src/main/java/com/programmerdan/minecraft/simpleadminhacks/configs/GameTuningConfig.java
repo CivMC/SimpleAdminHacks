@@ -56,6 +56,8 @@ public class GameTuningConfig extends SimpleHackConfig {
 	private boolean rainReduction;
 	private double rainOccurrenceChance;
 
+	private boolean allowVoxelMapCaveMode;
+
 	private Set<Material> noPlace;
 
 	public GameTuningConfig(SimpleAdminHacks plugin, ConfigurationSection base) {
@@ -116,6 +118,9 @@ public class GameTuningConfig extends SimpleHackConfig {
 
 		this.badOmen = config.getBoolean("badOmen", false);
 		if (!badOmen) plugin().log("Bad Omen effect is disabled.");
+
+		this.allowVoxelMapCaveMode = config.getBoolean("allowVoxelMapCaveMode", false);
+		if (!allowVoxelMapCaveMode) plugin().log("VoxelMap Cavemode disallowed.");
 
 		noPlace = new HashSet<>();
 		if(config.isList("noplace")) {
@@ -329,6 +334,10 @@ public class GameTuningConfig extends SimpleHackConfig {
 
 	public double getRainOccurrenceChance() {
 		return rainOccurrenceChance;
+	}
+
+	public boolean allowVoxelMapCaveMode() {
+		return allowVoxelMapCaveMode;
 	}
 
 	public boolean canPlace(Material mat) {
