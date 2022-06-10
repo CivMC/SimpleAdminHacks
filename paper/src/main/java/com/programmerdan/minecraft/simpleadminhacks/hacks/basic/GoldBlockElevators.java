@@ -30,6 +30,7 @@ public class GoldBlockElevators extends BasicHack {
 
 	@AutoLoad(processor = DataParser.MATERIAL)
 	private Material elevatorBlock;
+	private String elevatorBlockName;
 
 	private BooleanSetting useJumpSneakTP;
 	private DoubleInteractFixer interactFixer;
@@ -37,7 +38,6 @@ public class GoldBlockElevators extends BasicHack {
 	public GoldBlockElevators(SimpleAdminHacks plugin, BasicHackConfig config) {
 		super(plugin, config);
 		this.interactFixer = new DoubleInteractFixer(plugin);
-		initSettings();
 	}
 
 	@Override
@@ -46,13 +46,16 @@ public class GoldBlockElevators extends BasicHack {
 
 		if (elevatorBlock == null)
 			elevatorBlock = Material.GOLD_BLOCK;
+
+		elevatorBlockName = elevatorBlock.name().toLowerCase().replace("_", " ");
+		initSettings(); // Move #initSettings here so settings messages have elevator block name
 	}
 
 	private void initSettings() {
 		MenuSection mainMenu = plugin.getSettingManager().getMainMenu();
 		this.useJumpSneakTP =
-				new BooleanSetting(plugin, true, "Use Jump or Sneak to teleport on gold blocks", "jumpOrSneakTp",
-						"When true, jumping or sneaking on gold blocks will teleport you up/down, when false, right or left clicking will do the same.");
+				new BooleanSetting(plugin, true, String.format("Use Jump or Sneak to teleport on %ss", elevatorBlockName), "jumpOrSneakTp",
+						String.format("When true, jumping or sneaking on %ss will teleport you up/down, when false, right or left clicking will do the same.", elevatorBlockName));
 		PlayerSettingAPI.registerSetting(this.useJumpSneakTP, mainMenu);
 	}
 
@@ -74,7 +77,7 @@ public class GoldBlockElevators extends BasicHack {
 			}
 		}
 		event.getPlayer().sendMessage(
-				ChatColor.RED + "No gold block to teleport you down to. Jump to teleport up instead.");
+				ChatColor.RED + String.format("No %s to teleport you down to. Jump to teleport up instead.", elevatorBlockName));
 	}
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -92,7 +95,7 @@ public class GoldBlockElevators extends BasicHack {
 			}
 		}
 		event.getPlayer()
-				.sendMessage(ChatColor.RED + "No gold block to teleport you up to. Sneak to teleport down instead.");
+				.sendMessage(ChatColor.RED + String.format("No %s to teleport you up to. Sneak to teleport down instead.", elevatorBlockName));
 	}
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -124,7 +127,7 @@ public class GoldBlockElevators extends BasicHack {
 				}
 			}
 			event.getPlayer().sendMessage(
-					Component.text("No gold block to teleport you down to. Right click to teleport up instead.")
+					Component.text(String.format("No %s to teleport you down to. Right click to teleport up instead.", elevatorBlockName))
 							.color(NamedTextColor.RED));
 		} else {
 			for (int y = below.getY() + 1; y <= below.getWorld().getMaxHeight(); y++) {
@@ -133,7 +136,7 @@ public class GoldBlockElevators extends BasicHack {
 				}
 			}
 			event.getPlayer().sendMessage(
-					Component.text("No gold block to teleport you up to. Left click to teleport down instead.")
+					Component.text(String.format("No %s to teleport you up to. Left click to teleport down instead.", elevatorBlockName))
 							.color(NamedTextColor.RED));
 		}
 	}
