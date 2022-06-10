@@ -30,8 +30,8 @@ public class GoldBlockElevators extends BasicHack {
 
 	@AutoLoad(processor = DataParser.MATERIAL)
 	private Material elevatorBlock;
-	private String elevatorBlockName;
 
+	private String elevatorBlockName;
 	private BooleanSetting useJumpSneakTP;
 	private DoubleInteractFixer interactFixer;
 
