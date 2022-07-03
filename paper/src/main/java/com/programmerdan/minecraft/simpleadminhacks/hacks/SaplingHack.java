@@ -55,6 +55,9 @@ public class SaplingHack extends SimpleHack<SaplingConfig> implements Listener {
 		if (!checkIfLeafBlock(decayedBlock)) {
 			return;
 		}
+		if (!this.config.getChanceMap().containsKey(decayedBlock.getType())) {
+			return;
+		}
 		double nextDouble = random.nextDouble();
 		if (nextDouble <= this.config.getChanceMap().get(decayedBlock.getType())) {
 			decayedBlock.getWorld().dropItemNaturally(decayedBlock.getLocation(), new ItemStack(getSaplingMaterial(decayedBlock.getType()), 1));
