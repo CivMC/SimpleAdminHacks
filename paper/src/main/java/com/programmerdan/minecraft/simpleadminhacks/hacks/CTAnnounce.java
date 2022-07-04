@@ -57,20 +57,7 @@ public class CTAnnounce extends SimpleHack<CTAnnounceConfig> implements Listener
 		// Overlap is possible. Some people might get double-notified
 		for (BroadcastLevel level : config.getBroadcast()) {
 			plugin().debug("  Broadcast to {0}", level);
-			switch(level) {
-			case OP:
-				plugin().serverOperatorBroadcast(cleanMessage);
-				break;
-			case PERM:
-				plugin().serverBroadcast(cleanMessage); 
-				break;
-			case CONSOLE:
-				plugin().serverSendConsoleMessage(cleanMessage);
-				break;
-			case ALL:
-				plugin().serverOnlineBroadcast(cleanMessage);
-				break;
-			}
+			level.sendMessage(cleanMessage);
 		}
 	}
 

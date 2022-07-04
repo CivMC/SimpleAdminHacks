@@ -3,6 +3,7 @@ package com.programmerdan.minecraft.simpleadminhacks.hacks;
 import com.programmerdan.minecraft.simpleadminhacks.SimpleAdminHacks;
 import com.programmerdan.minecraft.simpleadminhacks.configs.ReinforcedChestBreakConfig;
 import com.programmerdan.minecraft.simpleadminhacks.framework.SimpleHack;
+import com.programmerdan.minecraft.simpleadminhacks.framework.utilities.BroadcastLevel;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -149,7 +150,7 @@ public class ReinforcedChestBreak extends SimpleHack<ReinforcedChestBreakConfig>
         @Override
         public void run() {
             for (String message: messages) {
-                plugin().serverOperatorBroadcast(message);
+				BroadcastLevel.OP.sendMessage(message);
             }
             messages.clear();
         }

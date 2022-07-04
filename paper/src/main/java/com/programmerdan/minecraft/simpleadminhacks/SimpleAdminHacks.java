@@ -3,11 +3,8 @@ package com.programmerdan.minecraft.simpleadminhacks;
 import com.programmerdan.minecraft.simpleadminhacks.framework.HackManager;
 import com.programmerdan.minecraft.simpleadminhacks.framework.commands.CommandRegistrar;
 import java.util.logging.Level;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
-import org.bukkit.entity.Player;
 import vg.civcraft.mc.civmodcore.ACivMod;
 
 /**
@@ -138,40 +135,6 @@ public class SimpleAdminHacks extends ACivMod {
 	@Deprecated
 	public boolean serverHasPlugin(String pluginName) {
 		return this.getServer().getPluginManager().isPluginEnabled(pluginName);
-	}
-
-	@Deprecated
-	public int serverBroadcast(String message) {
-		return this.getServer().broadcast(message, config().getBroadcastPermission());
-	}
-
-	@Deprecated
-	public int serverOperatorBroadcast(String message) {
-		int cnt = 0;
-		for(OfflinePlayer op : Bukkit.getOperators()) {
-			if (op.isOnline() && op.getPlayer() != null) {
-				op.getPlayer().sendMessage(message);
-				cnt ++;
-			}
-		}
-		return cnt;
-	}
-
-	@Deprecated
-	public int serverOnlineBroadcast(String message) {
-		int cnt = 0;
-		for (Player p : Bukkit.getOnlinePlayers()) {
-			if (p != null && p.isOnline()) {
-				p.sendMessage(message);
-				cnt ++;
-			}
-		}
-		return cnt;
-	}
-
-	@Deprecated
-	public void serverSendConsoleMessage(String message) {
-		Bukkit.getConsoleSender().sendMessage(message);
 	}
 
 }
