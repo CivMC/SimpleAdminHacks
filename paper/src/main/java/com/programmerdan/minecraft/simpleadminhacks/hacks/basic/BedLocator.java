@@ -9,6 +9,7 @@ import com.programmerdan.minecraft.simpleadminhacks.framework.BasicHack;
 import com.programmerdan.minecraft.simpleadminhacks.framework.BasicHackConfig;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import vg.civcraft.mc.civmodcore.chat.Componentify;
 import vg.civcraft.mc.civmodcore.world.WorldUtils;
@@ -39,15 +40,14 @@ public final class BedLocator extends BasicHack {
 		@CommandAlias("wheresmybed|locatebed")
 		@Description("Tells you where your bed is")
 		public void giveWand(final Player sender) {
-			final var bedLocation = sender.getBedSpawnLocation();
+			final Location bedLocation = sender.getBedSpawnLocation();
 			if (bedLocation == null) {
-				sender.sendMessage(Component.text("You do not a set bed.")
-						.color(NamedTextColor.GREEN));
+				sender.sendMessage(Component.text("Your bed is not set.", NamedTextColor.GREEN));
 				return;
 			}
 			sender.sendMessage(Component.text()
 					.color(NamedTextColor.GREEN)
-					.append(Component.text("Your bed is at "))
+					.content("Your bed is at ")
 					.append(Componentify.blockLocation(bedLocation)));
 			if (WorldUtils.doLocationsHaveSameWorld(sender.getLocation(), bedLocation)) {
 				sender.sendMessage('['
