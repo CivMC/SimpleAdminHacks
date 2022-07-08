@@ -41,7 +41,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
 /**
- *
+ * Create by psygate (github.com/psygate), 2022
  */
 public class BetterVehicles extends SimpleHack<BetterVehiclesConfig> {
 

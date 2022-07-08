@@ -4,8 +4,9 @@ import com.programmerdan.minecraft.simpleadminhacks.SimpleAdminHacks;
 import com.programmerdan.minecraft.simpleadminhacks.framework.SimpleHackConfig;
 import org.bukkit.configuration.ConfigurationSection;
 
+
 /**
- * @author psygate
+ * Create by psygate (github.com/psygate), 2022
  */
 public class BetterVehiclesConfig extends SimpleHackConfig {
 
