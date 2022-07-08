@@ -495,4 +495,8 @@ hacks:
     #"drop_itemstack" or "remove"
     garbage_collect_vehicle_strategy: drop_itemstack
     max_vehicle_age_in_seconds: 3
+    # this interval should be no smaller than the max_vehicle_age_in_seconds value. Else vehicles WILL exceed
+    # the preset maximum age
     gc_interval_in_ticks: 20
+    flush_record_interval_in_ticks: 200
+    persistence_file_path: plugins/SimpleAdminHacks/BetterVehicles.json

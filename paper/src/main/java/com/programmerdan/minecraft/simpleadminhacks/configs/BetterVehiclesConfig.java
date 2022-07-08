@@ -21,6 +21,8 @@ public class BetterVehiclesConfig extends SimpleHackConfig {
 	private boolean vehicleNotifyOnRemoval = true;
 
 	private long gcIntervalInTicks = 20 * 5;
+	private String persistenceFilePath;
+	private long flushRecordIntervalInTicks = 10;
 
 	public BetterVehiclesConfig(SimpleAdminHacks plugin, ConfigurationSection base) {
 		super(plugin, base);
@@ -33,6 +35,8 @@ public class BetterVehiclesConfig extends SimpleHackConfig {
 		garbageCollectVehicleStrategy = GarbageCollectVehicleStrategy.valueOf(config.getString("garbage_collect_vehicle_strategy").toUpperCase());
 		maxVehicleAgeInSeconds = config.getLong("max_boat_age_in_seconds");
 		gcIntervalInTicks = config.getLong("gc_interval_in_ticks");
+		persistenceFilePath = config.getString("persistence_file_path");
+		flushRecordIntervalInTicks = config.getLong("flush_record_interval_in_seconds");
 	}
 
 	public boolean isReturnVehiclesToInventoryOnExit() {
@@ -81,5 +85,21 @@ public class BetterVehiclesConfig extends SimpleHackConfig {
 
 	public void setGcIntervalInTicks(long gcIntervalInTicks) {
 		this.gcIntervalInTicks = gcIntervalInTicks;
+	}
+
+	public String getPersistenceFilePath() {
+		return persistenceFilePath;
+	}
+
+	public void setPersistenceFilePath(String persistenceFilePath) {
+		this.persistenceFilePath = persistenceFilePath;
+	}
+
+	public long getFlushRecordIntervalInTicks() {
+		return flushRecordIntervalInTicks;
+	}
+
+	public void setFlushRecordIntervalInTicks(long flushRecordIntervalInTicks) {
+		this.flushRecordIntervalInTicks = flushRecordIntervalInTicks;
 	}
 }

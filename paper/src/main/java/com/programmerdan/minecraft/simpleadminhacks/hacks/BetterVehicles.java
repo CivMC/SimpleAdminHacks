@@ -1,6 +1,9 @@
 package com.programmerdan.minecraft.simpleadminhacks.hacks;
 
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.programmerdan.minecraft.simpleadminhacks.SimpleAdminHacks;
 import com.programmerdan.minecraft.simpleadminhacks.configs.BetterVehiclesConfig;
 import com.programmerdan.minecraft.simpleadminhacks.framework.SimpleHack;
@@ -20,12 +23,22 @@ import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkPopulateEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.event.world.EntitiesLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.spigotmc.event.entity.EntityMountEvent;
 
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
 
 /**
  *
@@ -178,71 +191,30 @@ public class BetterVehicles extends SimpleHack<BetterVehiclesConfig> {
 		Bukkit.getWorlds().stream().map(World::getEntities).flatMap(Collection::stream).filter(BetterVehicles::isTrackedEntity).forEach(this::setupEntityTracking);
 	}
 
-	private void indexChunkEntities(Chunk chunk) {
-		Arrays.stream(Objects.requireNonNull(chunk).getEntities()).filter(BetterVehicles::isTrackedEntity).forEach(BetterVehicles.this::setupEntityTracking);
+	private void indexChunkEntitiesOnEvent(List<Entity> entities) {
+		entities.stream().filter(BetterVehicles::isTrackedEntity).forEach(BetterVehicles.this::setupEntityTracking);
 	}
 
 	/**
-	 * Starts tracking of entities in the chunk. If the chunk entities aren't loaded, the indexing is deferred to a later
-	 * tick, up until cutoff tries. After that the indexing is given up. See {@link #indexChunkEntities(Chunk)} for the
-	 * api call that should be used from the outside.
+	 * Garbage collect entities from the list of entities.
 	 *
-	 * @param chunk   Chunk to index entities in.
-	 * @param counter Counter index. Incremented by one every new try.
-	 * @param cutoff  Cutoff where to give up on indexing.
+	 * @param entities Entities to check if they have expired.
 	 */
-	private void indexChunkEntitiesOnEvent(Chunk chunk, int counter, int cutoff) {
-		if (counter >= cutoff) {
-			debugLog("Giving up on indexing  %d, %d, %s after %d tries.", chunk.getX(), chunk.getZ(), chunk.getWorld().getName(), counter);
-		} else if (chunk.isEntitiesLoaded()) {
-			indexChunkEntities(chunk);
-		} else {
-			onNextTick(() -> indexChunkEntitiesOnEvent(chunk, counter + 1, cutoff));
+	private void garbageCollectEntitiesOnChunkLoad(List<Entity> entities) {
+		long starttime = System.currentTimeMillis();
+
+		var it = entities.iterator();
+		while (it.hasNext()) {
+			var en = it.next();
+			trackedEntities.computeIfPresent(en.getUniqueId(), (key, value) -> {
+				if (evictByAge(value, starttime)) {
+					it.remove();
+					return null;
+				} else {
+					return value;
+				}
+			});
 		}
-	}
-
-	private void garbageCollectEntitiesOnChunkLoad(Chunk chunk) {
-		garbageCollectEntitiesOnChunkLoad(chunk, 0, 100);
-	}
-
-	/**
-	 * Garbage collect entities in the chunk. If the chunk entities aren't loaded, the gc is deferred to a later
-	 * tick, up until cutoff tries. After that the indexing is given up. See {@link #garbageCollectEntitiesOnChunkLoad(Chunk)}
-	 * for the api call that should be used from the outside.
-	 *
-	 * @param chunk   Chunk to index entities in.
-	 * @param counter Counter index. Incremented by one every new try.
-	 * @param cutoff  Cutoff where to give up on indexing.
-	 */
-	private void garbageCollectEntitiesOnChunkLoad(Chunk chunk, int counter, int cutoff) {
-		if (counter >= cutoff) {
-			debugLog("Giving up on garbage collecting  %d, %d, %s after %d tries.", chunk.getX(), chunk.getZ(), chunk.getWorld().getName(), counter);
-		} else if (chunk.isEntitiesLoaded()) {
-			long starttime = System.currentTimeMillis();
-
-			for (Entity en : chunk.getEntities()) {
-				trackedEntities.computeIfPresent(en.getUniqueId(), (key, value) -> {
-					if (evictByAge(value, starttime)) {
-						return null;
-					} else {
-						return value;
-					}
-				});
-			}
-		} else {
-			onNextTick(() -> garbageCollectEntitiesOnChunkLoad(chunk, counter + 1, cutoff));
-		}
-	}
-
-	/**
-	 * Garbage collect entities in the chunk. If the chunk entities aren't loaded, the gc is deferred to a later
-	 * tick, up until cutoff tries. After that the indexing is given up. See {@link #garbageCollectEntitiesOnChunkLoad(Chunk)}
-	 * for the api call that should be used from the outside.
-	 *
-	 * @param chunk Chunk to index entities in.
-	 */
-	private void indexChunkEntitiesOnEvent(Chunk chunk) {
-		indexChunkEntitiesOnEvent(chunk, 0, 100);
 	}
 
 	/**
@@ -251,13 +223,8 @@ public class BetterVehicles extends SimpleHack<BetterVehiclesConfig> {
 	private void addBaseListeners() {
 		addListener(new Listener() {
 			@EventHandler
-			public void onChunkCreate(ChunkPopulateEvent ev) {
-				indexChunkEntitiesOnEvent(ev.getChunk());
-			}
-
-			@EventHandler
-			public void onChunkLoad(ChunkLoadEvent ev) {
-				indexChunkEntitiesOnEvent(ev.getChunk());
+			public void onEntityLoad(EntitiesLoadEvent ev) {
+				indexChunkEntitiesOnEvent(ev.getEntities());
 			}
 
 			@EventHandler
@@ -354,8 +321,8 @@ public class BetterVehicles extends SimpleHack<BetterVehiclesConfig> {
 					}
 
 					@EventHandler
-					public void vehicleTracking(ChunkLoadEvent ev) {
-						garbageCollectEntitiesOnChunkLoad(ev.getChunk());
+					public void vehicleTracking(EntitiesLoadEvent ev) {
+						garbageCollectEntitiesOnChunkLoad(ev.getEntities());
 					}
 				});
 			}
@@ -372,6 +339,12 @@ public class BetterVehicles extends SimpleHack<BetterVehiclesConfig> {
 		}
 	}
 
+	/**
+	 * Check whether an entity can be evicted or not.
+	 *
+	 * @param en Entity record to check against.
+	 * @return True if the entity can be evicted for any number of reasons.
+	 */
 	private boolean canEvict(TrackedEntity en) {
 		Entity e = en.toEntity();
 
@@ -386,6 +359,15 @@ public class BetterVehicles extends SimpleHack<BetterVehiclesConfig> {
 		}
 	}
 
+	/**
+	 * Evict an entity by age. If the entity can't be evicted (#canEvict) or the entity is not old enough to be evicted,
+	 * this method does nothing. This method will do internal checks and may drop items in the world, or modify
+	 * player inventory.
+	 *
+	 * @param rec       Entity record to check.
+	 * @param starttime Time when the eviction process was started. (May be System.currentTimeMillis())
+	 * @return True if the entity was removed, else false.
+	 */
 	private boolean evictByAge(TrackedEntity rec, long starttime) {
 		//TODO prevent removal if someone is in the boat.
 		if (canEvict(rec)) {
@@ -427,6 +409,9 @@ public class BetterVehicles extends SimpleHack<BetterVehiclesConfig> {
 		return false;
 	}
 
+	/**
+	 * Add the garbage collectors, and necessary ticking infrastructure to support the garbage collecting process.
+	 */
 	private void addGarbageCollectors() {
 		if (config().isGarbageCollectVehicles()) {
 			//Skip cycles where we take longer or run twice at the same time.
@@ -442,8 +427,15 @@ public class BetterVehicles extends SimpleHack<BetterVehiclesConfig> {
 		}
 	}
 
-	private void notifyOwnerOnGCEvent(TrackedEntity value) {
-		Entity en = Bukkit.getEntity(value.id());
+	/**
+	 * Notify the owner of a tracked entity if their vehicle was removed. Entity (NOT RECORD) and owner may be null in
+	 * this case. If the entity is null, this method only notifies about a removal. If the owner is null, nobody
+	 * is notified.
+	 *
+	 * @param record Record to notify about.
+	 */
+	private void notifyOwnerOnGCEvent(TrackedEntity record) {
+		Entity en = Bukkit.getEntity(record.id());
 		Component msg;
 
 		if (en != null) {
@@ -452,7 +444,7 @@ public class BetterVehicles extends SimpleHack<BetterVehiclesConfig> {
 			msg = Component.text(String.format("Your %s was removed.", en.getType()));
 		}
 
-		Bukkit.getScheduler().runTaskAsynchronously(plugin(), () -> value.owner().map(Bukkit::getPlayer).ifPresent(c -> c.sendMessage(msg)));
+		Bukkit.getScheduler().runTaskAsynchronously(plugin(), () -> record.owner().map(Bukkit::getPlayer).ifPresent(c -> c.sendMessage(msg)));
 	}
 
 	private void startEntityTracking() {
@@ -462,20 +454,64 @@ public class BetterVehicles extends SimpleHack<BetterVehiclesConfig> {
 		addGarbageCollectors();
 	}
 
+	private void startRecordFlushTask() {
+		Bukkit.getScheduler().runTaskTimer(plugin(), this::storeRecords, config().getFlushRecordIntervalInTicks(), config.getFlushRecordIntervalInTicks());
+	}
+
 	@Override
 	public void onEnable() {
+		loadRecords();
 		startEntityTracking();
+		startRecordFlushTask();
 	}
 
-	private void onNextTick(Runnable runnable) {
-		// The following line does NOT run on the next tick, but on the same tick.
-		// Bukkit.getScheduler().runTask(plugin(), Objects.requireNonNull(runnable));
-		// This is a workaround.
-		Bukkit.getScheduler().runTaskLater(plugin(), Objects.requireNonNull(runnable), 1);
+	@Override
+	public void onDisable() {
+		storeRecords();
 	}
-
 
 	public static BetterVehiclesConfig generate(SimpleAdminHacks plugin, ConfigurationSection config) {
 		return new BetterVehiclesConfig(plugin, config);
+	}
+
+	private void loadRecords() {
+		final var listType = new TypeToken<ArrayList<TrackedEntity>>() {
+		}.getType();
+
+		var gson = new GsonBuilder().create();
+		var path = Paths.get(config().getPersistenceFilePath());
+
+		if (Files.exists(path)) {
+
+			List<TrackedEntity> list = Collections.emptyList();
+			if (Files.exists(Paths.get(config().getPersistenceFilePath()))) {
+				try (FileReader reader = new FileReader(config().getPersistenceFilePath())) {
+					list = gson.fromJson(reader, listType);
+				} catch (Exception e) {
+					plugin().getLogger().log(Level.SEVERE, "Failed to persist BetterVehicle records.");
+				}
+			}
+
+			list.forEach(en -> trackedEntities.put(en.id(), en));
+		}
+	}
+
+	private void storeRecords() {
+		var gson = new GsonBuilder().create();
+		var path = Paths.get(config().getPersistenceFilePath());
+
+		if (!Files.exists(path.getParent())) {
+			try {
+				Files.createDirectories(path);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		try (BufferedWriter writer = Files.newBufferedWriter(path)) {
+			gson.toJson(new ArrayList<>(trackedEntities.values()), writer);
+		} catch (Exception e) {
+			plugin().getLogger().log(Level.SEVERE, "Failed to persist BetterVehicle records.");
+		}
 	}
 }
