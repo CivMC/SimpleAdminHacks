@@ -119,9 +119,9 @@ public class BetterVehicles extends SimpleHack<BetterVehiclesConfig> {
 	}
 
 	private static void debugLog(String format, Object... values) {
-		var msg = String.format(format, values);
-		System.out.println(msg);
-		Bukkit.broadcast(Component.text(msg));
+//		var msg = String.format(format, values);
+//		System.out.println(msg);
+//		Bukkit.broadcast(Component.text(msg));
 	}
 
 	/**
