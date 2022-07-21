@@ -202,7 +202,7 @@ hacks:
   PortalModifyHack:
     enabled: false
     targetWorld: world_nether
-    homeWorld: world
+    homeWorld: worldUUID
   PortalSpawnModifier:
     enabled: true
     pigManChance: 0.5
@@ -256,7 +256,7 @@ hacks:
     enabled: false
     delay: 10000
     message: '%Victim% was combat tagged by %Attacker%'
-    broadcast: [OP, CONSOLE]
+    broadcast: [ OP, CONSOLE ]
   DisableAI:
     enabled: true
     # Specify below the living entities and their spawning circumstances you want to disable the AI for.
@@ -264,7 +264,7 @@ hacks:
     # NOTE: See https://papermc.io/javadocs/paper/1.16/org/bukkit/event/entity/CreatureSpawnEvent.SpawnReason.html
     # Note: You can also just state "ALL" for all spawn circumstances
     VILLAGER: ALL
-    ENDERMITE: [DISPENSE_EGG, EGG, SPAWNER_EGG]
+    ENDERMITE: [ DISPENSE_EGG, EGG, SPAWNER_EGG ]
   ElytraFeatures:
     enabled: true
     # Whether Elytra flight should be outright disabled
@@ -277,12 +277,12 @@ hacks:
     disableFireworkBoostingInCombat: false
     # Whether to restrict firework boosting to explosive fireworks
     disableSafeFireworkBoosting: false
-    # This regulates player damage when Elytra flying above world height.
+    # This regulates player damage when Elytra flying above worldUUID height.
     heightDamage:
       # The amount of damage (in half-hearts) the flier should take.
       # NOTE: Setting to 0 will disable the damage.
       damage: 1
-      # The damage is multiplied by the number of blocks above world height multiplied by this number.
+      # The damage is multiplied by the number of blocks above worldUUID height multiplied by this number.
       scales: 1.0
       # The amount of blocks above height limit where damage is not applied.
       buffer: 5
@@ -356,8 +356,8 @@ hacks:
         REDSTONE_COMPARATOR: 4
         OBSERVER: 2
       exempt:
-      - Steve
-      - Alex
+        - Steve
+        - Alex
     daytimeBed:
       enabled: true
       spawnSetMessage: '&7Your spawn has been set.'
@@ -384,7 +384,7 @@ hacks:
     badOmen: false
     #a list of materials players shouldn't be allowed to place at all
     noplace:
-     - DRAGON_EGG
+      - DRAGON_EGG
     rainReduction:
       enabled: false
       rainOccurrenceChance: .5
@@ -403,7 +403,7 @@ hacks:
       - org.bukkit.event.painting
       - org.bukkit.event.vehicle
       - org.bukkit.event.weather
-      - org.bukkit.event.world
+      - org.bukkit.event.worldUUID
   Introbook:
     enabled: true
     follow: true
@@ -414,7 +414,7 @@ hacks:
         - "   &oWelcome to Devoted, ${player}!"
         - "    &oWhat is Devoted?\n\"A new type of Minecraft server built towards providing a competitive, high stakes, immersive experience controlled by the players.\"&r\n-ShadedJon, server owner"
         - "    &oWhat is Devoted?&r\n&lNOT just survival&r\nAdmins are hands-off and only handle glitches and hackers\n&lNOT just chaos&r\nPlugins allow players and towns to enforce their own rules\n&lNOT just roleplay&r\nNobody pretends -- conflict is genuine and heated"
-        - "    &oBasic Mechanics&r\n-The world is custom generated\n-Many custom biomes\n-Limited chat range\n-Respawn in random area unless you sleep\n-Mobs spawn sparsely\n-Vanilla Nether\n-Ore veins and custom ore spawning."
+        - "    &oBasic Mechanics&r\n-The worldUUID is custom generated\n-Many custom biomes\n-Limited chat range\n-Respawn in random area unless you sleep\n-Mobs spawn sparsely\n-Vanilla Nether\n-Ore veins and custom ore spawning."
         - "   &oDevoted Mods&r\n   &lCitadel&r:\n Reinforces things so it takes numerous breaks to destroy them. Locks some things too.\n&lMore Info:&r &oVisual Guide:&r imgur.com/BnlL2 &oWiki Page:&r tinyurl.com/citadelmod\n&oType \"/help citadel\" in chat to get commands"
         - "   &lPrison Pearl&r:\n Ender Pearls trap players in the end. Others can steal back your pearl and free you -- you always know where it is so they cannot hide it\n&lMore Info:&r &oVisual Guide:&r imgur.com/XbhkK &oWiki Page:&r tinyurl.com/prisperl"
         - "   &lJuke Alert&r:\n Creates 'Juke' blocks that record player activity in radius. If you steal, grief, or trespass -- people will know about it & put a bounty for you to be pearled.\n&lMore Info:&r &oWiki Page:&r tinyurl.com/snitchblock"
@@ -428,38 +428,56 @@ hacks:
         - "We extend our appreciation to the devs, admins, and players at: &oreddit.com/r/Civcraft"
   InvControl:
     enabled: true
+
+  Limits:
+    enabled: false
+    chunk_limits:
+      cache_configuration:
+        initial_capacity: 1000
+        maximum_capacity: 5000
+        expire_after_access_value: 8
+        expire_after_access_time_unit: HOURS
+        expire_after_write_value: 8
+        expire_after_write_time_unit: HOURS
+
+      block_limits:
+        - materials: [ PISTON, STICKY_PISTON ]
+          max: 4
+        - materials: [ PISTON, REDSTONE_BLOCK ]
+          max: 4
+
   NewfriendAssist:
     enabled: true
     announce: '&f%Player% is brand new!'
     giveIntroKitToRandomSpawners: true
-    broadcast: [PERM, CONSOLE]
+    broadcast: [ PERM, CONSOLE ]
     helptips: on
     helptips_end: 20m
     introkit:
       enabled: true
       contents:
-       - ==: org.bukkit.inventory.ItemStack
-         v: 1
-         type: COOKIE
-         amount: 32
-         meta:
-           ==: ItemMeta
-           meta-type: UNSPECIFIC
-           display-name: 'Manna'
-           lore:
-            - "Gift from the Admins as you"
-            - "begin your journey on Devotion."
-       - ==: org.bukkit.inventory.ItemStack
-         v: 1
-         type: RED_BED
-         amount: 1
-         meta:
-           ==: ItemMeta
-           meta-type: UNSPECIFIC
-           lore:
-            - "This world is unforgiving."
-            - "Be sure to get a good night's"
-            - "rest soon."
+        - ==: org.bukkit.inventory.ItemStack
+          v: 1
+          type: COOKIE
+          amount: 32
+          meta:
+            ==: ItemMeta
+            meta-type: UNSPECIFIC
+            display-name: 'Manna'
+            lore:
+              - "Gift from the Admins as you"
+              - "begin your journey on Devotion."
+        - ==: org.bukkit.inventory.ItemStack
+          v: 1
+          type: RED_BED
+          amount: 1
+          meta:
+            ==: ItemMeta
+            meta-type: UNSPECIFIC
+            lore:
+              - "This worldUUID is unforgiving."
+              - "Be sure to get a good night's"
+              - "rest soon."
   ReinforcedChestBreak:
     enabled: true
     # in seconds
