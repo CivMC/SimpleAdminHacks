@@ -3,6 +3,7 @@ package com.programmerdan.minecraft.simpleadminhacks.configs.limits;
 import com.programmerdan.minecraft.simpleadminhacks.SimpleAdminHacks;
 import com.programmerdan.minecraft.simpleadminhacks.framework.SimpleHackConfig;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -48,13 +49,60 @@ public class LimitsConfig extends SimpleHackConfig {
 			.getConfigurationSection("chunk_limits").getConfigurationSection("cache_configuration");
 
 		chunkDataCacheConfig = new CacheConfig(
-			chunkCacheConfig.getInt("initial_capacity"),
-			chunkCacheConfig.getInt("maximum_capacity"),
-			chunkCacheConfig.getLong("expire_after_access_value"),
-			TimeUnit.valueOf(chunkCacheConfig.getString("expire_after_access_time_unit").trim().toUpperCase()),
-			chunkCacheConfig.getLong("expire_after_write_value"),
+			getInitialCapacityFromConfig(chunkCacheConfig),
+			getMaximumCapacityFromConfig(chunkCacheConfig),
+			getExpireAfterAccessFromConfig(chunkCacheConfig),
+			parseTimeUnit(chunkCacheConfig, "expire_after_access_time_unit"),
+			getExpireAfterWriteFromConfig(chunkCacheConfig),
 			TimeUnit.valueOf(chunkCacheConfig.getString("expire_after_write_time_unit").trim().toUpperCase())
 		);
+	}
+
+	private TimeUnit parseTimeUnit(ConfigurationSection chunkCacheConfig, String name) {
+		var timeunitname = Objects.requireNonNull(chunkCacheConfig.getString(name));
+		try {
+			return TimeUnit.valueOf(chunkCacheConfig.getString(name).trim().toUpperCase());
+		} catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException("Cannot parse value for " + name + " \"" + timeunitname + "\". " +
+				"Possible values: " + Arrays.toString(TimeUnit.values()), e);
+		}
+	}
+
+	private long getExpireAfterAccessFromConfig(ConfigurationSection chunkCacheConfig) {
+		var expireAfterAccessValue = chunkCacheConfig.getLong("expire_after_access_value");
+
+		if (expireAfterAccessValue <= 0) {
+			throw new IllegalArgumentException("expire_after_access_value for Limits cannot be less than 0.");
+		}
+
+		return expireAfterAccessValue;
+	}
+
+	private long getExpireAfterWriteFromConfig(ConfigurationSection chunkCacheConfig) {
+		var expireAfterWriteValue = chunkCacheConfig.getLong("expire_after_write_value");
+
+		if (expireAfterWriteValue <= 0) {
+			throw new IllegalArgumentException("expire_after_write_value for Limits cannot be less than 0.");
+		}
+
+		return expireAfterWriteValue;
+	}
+
+	private int getMaximumCapacityFromConfig(ConfigurationSection chunkCacheConfig) {
+		var initial = getInitialCapacityFromConfig(chunkCacheConfig);
+		var maxconf = chunkCacheConfig.getInt("maximum_capacity");
+		if (maxconf < 1) throw new IllegalArgumentException("maximum_capacity for Limits cannot be less than 1.");
+		if (maxconf < initial) {
+			throw new IllegalArgumentException("maximum_capacity for Limits cannot be less than initial_capacity.");
+		}
+
+		return maxconf;
+	}
+
+	private int getInitialCapacityFromConfig(ConfigurationSection chunkCacheConfig) {
+		var initial = chunkCacheConfig.getInt("initial_capacity");
+		if (initial < 1) throw new IllegalArgumentException("initial_capacity for Limits cannot be less than 1.");
+		return initial;
 	}
 
 	public CacheConfig getChunkDataCacheConfig() {
