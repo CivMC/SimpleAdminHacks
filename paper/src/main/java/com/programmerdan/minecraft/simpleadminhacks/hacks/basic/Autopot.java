@@ -3,11 +3,14 @@ package com.programmerdan.minecraft.simpleadminhacks.hacks.basic;
 import com.programmerdan.minecraft.simpleadminhacks.SimpleAdminHacks;
 import com.programmerdan.minecraft.simpleadminhacks.framework.BasicHack;
 import com.programmerdan.minecraft.simpleadminhacks.framework.BasicHackConfig;
+import com.programmerdan.minecraft.simpleadminhacks.framework.autoload.AutoLoad;
 import java.util.UUID;
 import org.bukkit.Color;
 import org.bukkit.Effect;
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.Inventory;
@@ -20,6 +23,9 @@ import vg.civcraft.mc.civmodcore.players.settings.PlayerSettingAPI;
 import vg.civcraft.mc.civmodcore.players.settings.impl.DoubleSetting;
 
 public class Autopot extends BasicHack {
+
+	@AutoLoad
+	private boolean should_pots_have_aoe;
 
 	private DoubleSetting doubleSetting;
 	public Autopot(SimpleAdminHacks plugin, BasicHackConfig config) {
@@ -54,7 +60,20 @@ public class Autopot extends BasicHack {
 		if (amplifer == null) {
 			return;
 		}
-		player.addPotionEffect(new PotionEffect(PotionEffectType.HEAL, 1, amplifer, true, true, true));
+		PotionEffect effect = new PotionEffect(PotionEffectType.HEAL, 1, amplifer, true, true, true);
+		if (should_pots_have_aoe) {
+			ItemStack itemStack = new ItemStack(Material.SPLASH_POTION);
+			PotionMeta potionMeta = (PotionMeta) itemStack.getItemMeta();
+
+			potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.HEAL, 1, amplifer), true);
+
+			itemStack.setItemMeta(potionMeta);
+
+			ThrownPotion thrownPotion = (ThrownPotion) player.getWorld().spawnEntity(player.getLocation(), EntityType.SPLASH_POTION);
+			thrownPotion.setItem(itemStack);
+			return;
+		}
+		player.addPotionEffect(effect);
 		player.getWorld().playEffect(player.getLocation(), Effect.INSTANT_POTION_BREAK, Color.RED);
 	}
 

@@ -66,6 +66,8 @@ hacks:
     roundPlayerListPing: true
   Autopot:
     enabled: false
+    #Should an actual potion be spawned in the world to affect other players?
+    should_pots_have_aoe: false
   AutoRespawn:
     enabled: true
     # Delay in MS
