@@ -65,6 +65,10 @@ public class OneTimeTeleport extends SimpleHack<OneTimeTeleportConfig> implement
 				return true;
 			case 2:
 				if (args[0].equalsIgnoreCase("revoke")) {
+					if (!this.senderToReciever.containsKey(player.getUniqueId())) {
+						player.sendMessage(Component.text("You have no active OTT requests", NamedTextColor.RED));
+						return true;
+					}
 					this.hasOTT.setValue(player.getUniqueId(), true);
 					this.senderToReciever.remove(player.getUniqueId());
 					player.sendMessage(Component.text("You have revoked your OTT request!", NamedTextColor.GREEN));
@@ -98,6 +102,7 @@ public class OneTimeTeleport extends SimpleHack<OneTimeTeleportConfig> implement
 						return true;
 					}
 					removeBlacklistItems(targetPlayer.getInventory());
+					targetPlayer.sendMessage(Component.text("You may find some items missing after teleporting, these were removed as they are blacklisted to be teleported with!", NamedTextColor.AQUA));
 					targetPlayer.teleport(player.getLocation());
 					player.sendMessage(Component.text(targetPlayer.getName() + " has been teleported to you!", NamedTextColor.GREEN));
 					return true;
