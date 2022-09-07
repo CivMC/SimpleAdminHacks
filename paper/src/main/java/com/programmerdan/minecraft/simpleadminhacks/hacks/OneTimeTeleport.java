@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -62,6 +63,8 @@ public class OneTimeTeleport extends SimpleHack<OneTimeTeleportConfig> implement
 				}
 				player.sendMessage(Component.text("You have requested to teleport to " + target.getName() + "!", NamedTextColor.GREEN));
 				requestOTT(player.getUniqueId(), target.getUniqueId());
+				target.sendMessage(Component.text(player.getName() + " has requested to teleport to you! Click me or type /ott accept " + player.getName() + " to accept!", NamedTextColor.GREEN).clickEvent(
+						ClickEvent.runCommand("/ott accept " + player.getName())));
 				return true;
 			case 2:
 				if (args[0].equalsIgnoreCase("revoke")) {
@@ -99,6 +102,7 @@ public class OneTimeTeleport extends SimpleHack<OneTimeTeleportConfig> implement
 					long timeJoined = targetPlayer.getFirstPlayed();
 					if (System.currentTimeMillis() > (timeJoined + config.getTimelimitOnUsageInMillis())) {
 						targetPlayer.sendMessage(Component.text("You have ran out of time to use your one time teleport!"));
+						this.hasOTT.setValue(targetPlayer.getUniqueId(), false);
 						return true;
 					}
 					removeBlacklistItems(targetPlayer.getInventory());
