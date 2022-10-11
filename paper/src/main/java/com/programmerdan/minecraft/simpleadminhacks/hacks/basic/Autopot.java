@@ -89,7 +89,8 @@ public class Autopot extends BasicHack {
 		if (inventory == null) {
 			return null;
 		}
-		for (ItemStack is : inventory.getContents()) {
+		for (int i = inventory.getSize(); i >= 0; i--) {
+			ItemStack is = inventory.getItem(i);
 			if (is == null) {
 				continue;
 			}
