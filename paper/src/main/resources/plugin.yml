@@ -1,11 +1,12 @@
-name: ${name}
+name: ${pluginName}
 main: com.programmerdan.minecraft.simpleadminhacks.SimpleAdminHacks
 author: ProgrammerDan
 authors: [ProgrammerDan, Maxopoly]
 version: ${version}
 depend: [CivModCore]
 softdepend: [CombatTagPlus, NameLayer, Citadel, ProtocolLib, BanStick]
-api-version: 1.18
+description: ${description}
+api-version: ${api_version}
 commands:
   hacks:
     description: Shows the various hacks and fixes supported by this plugin and controls them

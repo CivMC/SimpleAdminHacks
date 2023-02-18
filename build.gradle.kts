@@ -1,59 +1,61 @@
-import net.civmc.civgradle.common.util.civRepo
-
 plugins {
-    `java-library`
-    `maven-publish`
-    id("net.civmc.civgradle.plugin") version "1.0.0-SNAPSHOT"
+	`java-library`
+	`maven-publish`
 }
 
-// Temporary hack:
-// Remove the root build directory
 gradle.buildFinished {
 	project.buildDir.deleteRecursively()
 }
 
 allprojects {
-	group = "net.civmc.simpleadminhacks"
-	version = "2.1.1"
-	description = "SimpleAdminHacks"
+	group = rootProject.group
+	version = rootProject.version
+	description = rootProject.description
 }
 
 subprojects {
-	apply(plugin = "net.civmc.civgradle.plugin")
 	apply(plugin = "java-library")
 	apply(plugin = "maven-publish")
 
 	java {
-		toolchain {
-			languageVersion.set(JavaLanguageVersion.of(17))
+		toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+		withJavadocJar()
+		withSourcesJar()
+	}
+
+	tasks {
+		compileJava {
+			options.encoding = Charsets.UTF_8.name()
+			options.release.set(17)
+		}
+		processResources {
+			filteringCharset = Charsets.UTF_8.name()
+			filesMatching("**/plugin.yml") {
+				expand( project.properties )
+			}
 		}
 	}
 
 	repositories {
 		mavenCentral()
-        civRepo("CivMC/CivModCore")
-        civRepo("CivMC/NameLayer")
-        civRepo("CivMC/Citadel")
-        civRepo("CivMC/CombatTagPlus")
-        civRepo("CivMC/BanStick")
-        maven("https://repo.dmulloy2.net/repository/public/")
-        maven("https://ci.frostcast.net/plugin/repository/everything")
-        maven("https://jitpack.io")
+		maven("https://repo.dmulloy2.net/repository/public/")
+		maven("https://ci.frostcast.net/plugin/repository/everything")
+		maven("https://jitpack.io")
+		maven("https://nexus.civunion.com/repository/maven-public/")
 	}
 
 	publishing {
 		repositories {
 			maven {
-				name = "GitHubPackages"
-				url = uri("https://maven.pkg.github.com/CivMC/SimpleAdminHacks")
+				url = uri("https://nexus.civunion.com/repository/maven-releases/")
 				credentials {
-					username = System.getenv("GITHUB_ACTOR")
-					password = System.getenv("GITHUB_TOKEN")
+					username = System.getenv("REPO_USERNAME")
+					password = System.getenv("REPO_PASSWORD")
 				}
 			}
 		}
 		publications {
-			register<MavenPublication>("gpr") {
+			register<MavenPublication>("main") {
 				from(components["java"])
 			}
 		}
