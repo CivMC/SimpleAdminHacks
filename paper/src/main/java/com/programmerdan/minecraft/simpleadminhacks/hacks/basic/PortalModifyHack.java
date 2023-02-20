@@ -21,6 +21,8 @@ public class PortalModifyHack extends BasicHack {
 	private String targetWorld;
 	@AutoLoad
 	private String homeWorld;
+	@AutoLoad
+	private int targetYlevel;
 	
 	public PortalModifyHack(SimpleAdminHacks plugin, BasicHackConfig config) {
 		super(plugin, config);
@@ -38,15 +40,10 @@ public class PortalModifyHack extends BasicHack {
 			return;
 		}
 		Location to;
-		switch (getTargetWorld(player).getEnvironment()) {
-			case NETHER:
-				to = new Location(getTargetWorld(player), event.getFrom().getX(), 125, event.getFrom().getZ());
-				break;
-			case NORMAL:
-				to = getTargetWorld(player).getHighestBlockAt(player.getLocation(), HeightMap.WORLD_SURFACE).getLocation().toCenterLocation().add(0,1,0);
-				break;
-			default:
-				return;
+		if (getTargetWorld(player).equals(world)) {
+			to = new Location(getTargetWorld(player), event.getFrom().getX(), targetYlevel, event.getFrom().getZ());
+		} else {
+			to = getTargetWorld(player).getHighestBlockAt(player.getLocation(), HeightMap.WORLD_SURFACE).getLocation().toCenterLocation().add(0, 1, 0);
 		}
 		event.setTo(to);
 		if (to.getWorld().getName().equals(targetWorld)) {

@@ -64,6 +64,10 @@ hacks:
     hideHealth: true
     # Limit player ping in the tablist to the same 6 values vanilla clients can discern visually
     roundPlayerListPing: true
+  Autopot:
+    enabled: false
+    #Should an actual potion be spawned in the world to affect other players?
+    should_pots_have_aoe: false
   AutoRespawn:
     enabled: true
     # Delay in MS
@@ -202,6 +206,7 @@ hacks:
   PortalModifyHack:
     enabled: false
     targetWorld: world_nether
+    targetYlevel: 125
     homeWorld: world
   PortalSpawnModifier:
     enabled: true

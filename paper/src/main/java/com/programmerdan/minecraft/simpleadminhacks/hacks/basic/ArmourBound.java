@@ -15,10 +15,13 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -111,6 +114,56 @@ public class ArmourBound extends BasicHack {
 			if (viewer instanceof final Player playerViewer) {
 				playerViewer.updateInventory();
 			}
+		}
+	}
+
+	@EventHandler
+	public void onAnvilRepair(PrepareAnvilEvent event) {
+		AnvilInventory inventory = event.getInventory();
+		ItemStack first = inventory.getFirstItem();
+		if (first == null || first.getType() == Material.AIR) {
+			return;
+		}
+		ItemStack second = inventory.getSecondItem();
+		ItemStack result = event.getResult();
+		if (second == null || second.getType() == Material.AIR) {
+			return;
+		}
+		if (result == null || result.getType() == Material.AIR) {
+			return;
+		}
+		if (!first.hasItemMeta()) {
+			return;
+		}
+		if (!second.hasItemMeta()) {
+			return;
+		}
+		PersistentDataContainer firstContainer = first.getItemMeta().getPersistentDataContainer();
+		PersistentDataContainer secondContainer = second.getItemMeta().getPersistentDataContainer();
+		if (!firstContainer.has(this.key, PersistentDataType.STRING)) {
+			if (secondContainer.has(this.key, PersistentDataType.STRING)) {
+				result.setItemMeta(second.getItemMeta());
+				result.editMeta(meta -> {
+					if (meta instanceof Damageable damageable) {
+						damageable.setDamage(((Damageable)event.getResult().getItemMeta()).getDamage());
+					}
+				});
+				event.setResult(result);
+			}
+			return;
+		}
+		UUID firstUUID = UUID.fromString(firstContainer.get(this.key, PersistentDataType.STRING));
+		if (!secondContainer.has(this.key, PersistentDataType.STRING)) {
+			return;
+		}
+		UUID secondUUID = UUID.fromString(secondContainer.get(this.key, PersistentDataType.STRING));
+		if (firstUUID.equals(secondUUID)) {
+			//We dont want to do anything if these both match, otherwise set the result to null
+			return;
+		}
+		event.setResult(null);
+		for (HumanEntity entity : inventory.getViewers()) {
+			((Player)entity).updateInventory();
 		}
 	}
 
