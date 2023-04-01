@@ -11,8 +11,9 @@ import vg.civcraft.mc.civmodcore.config.ConfigHelper;
 
 public class OneTimeTeleportConfig extends SimpleHackConfig {
 
-	private List<String> itemBlacklistString;
+	//private List<String> itemBlacklistString;
 	private List<Material> materialBlacklist;
+	private List<Material> unsafeMaterials;
 	private long timelimitOnUsage;
 
 	public OneTimeTeleportConfig(SimpleAdminHacks plugin,
@@ -21,7 +22,7 @@ public class OneTimeTeleportConfig extends SimpleHackConfig {
 
 	@Override
 	protected void wireup(ConfigurationSection config) {
-		this.itemBlacklistString = config.getStringList("material_blacklist");
+		List<String> itemBlacklistString = config.getStringList("material_blacklist");
 		if (itemBlacklistString.isEmpty()) {
 			plugin().getLogger().warning("material_blacklist was empty? is this an error?");
 		}
@@ -34,11 +35,27 @@ public class OneTimeTeleportConfig extends SimpleHackConfig {
 			}
 			materialBlacklist.add(material);
 		}
+
+
+		this.unsafeMaterials = new ArrayList<>();
+		List<String> unsafeMaterialsString = config.getStringList("unsafe_materials");
+		for (String s : unsafeMaterialsString) {
+			Material material = Material.matchMaterial(s);
+			if (material == null) {
+				plugin().getLogger().warning("Material " + s + " in unsafe materials list for OTT couldn't be matched, skipping but is this a typo?");
+				continue;
+			}
+			materialBlacklist.add(material);
+		}
 		this.timelimitOnUsage = ConfigHelper.parseTime(config.getString("ott_timeout", "2d"));
 	}
 
 	public List<Material> getMaterialBlacklist() {
 		return Collections.unmodifiableList(materialBlacklist);
+	}
+
+	public List<Material> getUnsafeMaterials() {
+		return Collections.unmodifiableList(unsafeMaterials);
 	}
 
 	public long getTimelimitOnUsageInMillis() {
