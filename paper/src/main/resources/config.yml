@@ -300,6 +300,8 @@ hacks:
     postteleport:
       spy: false
       count: 10
+  Fullbright:
+    enabled: true
   GameFeatures:
     enabled: true
     disablePotatoXP: false

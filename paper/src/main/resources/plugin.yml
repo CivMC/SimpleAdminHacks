@@ -93,6 +93,9 @@ commands:
   ott:
     description: Allows a player a one time teleport
     usage: /<command> <player>
+  gamma:
+    description: Toggles gammabright
+    usage: /<command>
 permissions:
   simpleadmin.*:
     description: Gives access to all SimpleAdminHacks commands
