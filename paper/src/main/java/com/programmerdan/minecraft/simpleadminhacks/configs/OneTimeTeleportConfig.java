@@ -2,18 +2,22 @@ package com.programmerdan.minecraft.simpleadminhacks.configs;
 
 import com.programmerdan.minecraft.simpleadminhacks.SimpleAdminHacks;
 import com.programmerdan.minecraft.simpleadminhacks.framework.SimpleHackConfig;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
+import vg.civcraft.mc.civmodcore.config.ConfigHelper;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
-import vg.civcraft.mc.civmodcore.config.ConfigHelper;
 
 public class OneTimeTeleportConfig extends SimpleHackConfig {
 
 	//private List<String> itemBlacklistString;
 	private List<Material> materialBlacklist;
 	private List<Material> unsafeMaterials;
+	private List<String> worldBlacklist;
 	private long timelimitOnUsage;
 
 	public OneTimeTeleportConfig(SimpleAdminHacks plugin,
@@ -47,6 +51,15 @@ public class OneTimeTeleportConfig extends SimpleHackConfig {
 			}
 			materialBlacklist.add(material);
 		}
+		this.worldBlacklist = new ArrayList<>();
+		List<String> worlds = config.getStringList("home_world_blacklist");
+		for (String world : worlds) {
+			World realWorld = Bukkit.getWorld(world);
+			if (realWorld == null) {
+				continue;
+			}
+			this.worldBlacklist.add(world);
+		}
 		this.timelimitOnUsage = ConfigHelper.parseTime(config.getString("ott_timeout", "2d"));
 	}
 
@@ -56,6 +69,10 @@ public class OneTimeTeleportConfig extends SimpleHackConfig {
 
 	public List<Material> getUnsafeMaterials() {
 		return Collections.unmodifiableList(unsafeMaterials);
+	}
+
+	public List<String> getWorldBlacklist() {
+		return Collections.unmodifiableList(worldBlacklist);
 	}
 
 	public long getTimelimitOnUsageInMillis() {
