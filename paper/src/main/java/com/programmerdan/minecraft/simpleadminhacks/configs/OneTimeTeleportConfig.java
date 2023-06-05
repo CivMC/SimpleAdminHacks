@@ -14,7 +14,6 @@ import java.util.List;
 
 public class OneTimeTeleportConfig extends SimpleHackConfig {
 
-	//private List<String> itemBlacklistString;
 	private List<Material> materialBlacklist;
 	private List<Material> unsafeMaterials;
 	private List<String> worldBlacklist;
