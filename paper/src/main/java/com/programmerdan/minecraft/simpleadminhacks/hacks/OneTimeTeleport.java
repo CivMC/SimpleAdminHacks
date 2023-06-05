@@ -247,6 +247,14 @@ public class OneTimeTeleport extends SimpleHack<OneTimeTeleportConfig> implement
 		}
 	}
 
+	@Override
+	public void registerListeners() {
+		if (config.isEnabled()) {
+			plugin().log("Registering OTT listener");
+			plugin().registerListener(this);
+		}
+	}
+
 	private void registerSettings() {
 		//Default this to false since we want to set it true if the player has logged in for the first time
 		this.hasOTT = new BooleanSetting(this.plugin,
