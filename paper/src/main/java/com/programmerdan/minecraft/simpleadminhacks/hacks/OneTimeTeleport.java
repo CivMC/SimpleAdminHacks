@@ -1,22 +1,18 @@
 package com.programmerdan.minecraft.simpleadminhacks.hacks;
 
-import com.destroystokyo.paper.event.player.PlayerInitialSpawnEvent;
 import com.programmerdan.minecraft.simpleadminhacks.SimpleAdminHacks;
 import com.programmerdan.minecraft.simpleadminhacks.configs.OneTimeTeleportConfig;
 import com.programmerdan.minecraft.simpleadminhacks.framework.SimpleHack;
-
-import java.util.*;
-
 import isaac.bastion.Bastion;
 import isaac.bastion.BastionBlock;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentBuilder;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -24,7 +20,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.spigotmc.event.player.PlayerSpawnLocationEvent;
@@ -33,7 +29,9 @@ import vg.civcraft.mc.civmodcore.players.settings.impl.BooleanSetting;
 import vg.civcraft.mc.civmodcore.players.settings.impl.LongSetting;
 import vg.civcraft.mc.civmodcore.utilities.TextUtil;
 
-public class OneTimeTeleport extends SimpleHack<OneTimeTeleportConfig> implements CommandExecutor {
+import java.util.*;
+
+public class OneTimeTeleport extends SimpleHack<OneTimeTeleportConfig> implements Listener, CommandExecutor {
 
 	private BooleanSetting hasOTT;
 	private LongSetting timeSinceGranted;
@@ -58,7 +56,6 @@ public class OneTimeTeleport extends SimpleHack<OneTimeTeleportConfig> implement
 				if(!this.checkOTT(player.getUniqueId())){
 					player.sendMessage(Component.text("You don't have a one time teleport.", NamedTextColor.RED));
 				}else{
-					//TextUtil.formatDuration()
 					long time = this.config.getTimelimitOnUsageInMillis() - (System.currentTimeMillis() - this.timeSinceGranted.getValue(player.getUniqueId()));
 					player.sendMessage(Component.text("Your one time teleport will expire in " + TextUtil.formatDuration(time), NamedTextColor.GREEN));
 				}
@@ -140,17 +137,6 @@ public class OneTimeTeleport extends SimpleHack<OneTimeTeleportConfig> implement
 						targetPlayer.sendMessage(Component.text(player.getName() + " tried to accept your one-time teleport in an unsafe location!"));
 						return true;
 					}
-
-
-					/*
-					long timeJoined = targetPlayer.getFirstPlayed();
-					if (System.currentTimeMillis() > (timeJoined + config.getTimelimitOnUsageInMillis())) {
-						targetPlayer.sendMessage(Component.text("You have ran out of time to use your one time teleport!"));
-						this.hasOTT.setValue(targetPlayer.getUniqueId(), false);
-						return true;
-					}
-					 */
-
 					removeBlacklistItems(targetPlayer.getInventory());
 					targetPlayer.sendMessage(Component.text("You may find some items missing after teleporting, these were removed as they are blacklisted to be teleported with!", NamedTextColor.AQUA));
 					targetPlayer.teleport(player.getLocation());
@@ -165,7 +151,6 @@ public class OneTimeTeleport extends SimpleHack<OneTimeTeleportConfig> implement
 
 	public void requestOTT(UUID sender, UUID reciever) {
 		this.senderToReciever.put(sender, reciever);
-		//this.hasOTT.setValue(sender, false);
 	}
 
 	public void removeBlacklistItems(Inventory inventory) {
@@ -200,6 +185,10 @@ public class OneTimeTeleport extends SimpleHack<OneTimeTeleportConfig> implement
 			return false;
 		}
 
+		if (config.getWorldBlacklist().contains(player.getWorld().getName())) {
+			player.sendMessage(Component.text("You cannot teleport out of this world!").color(NamedTextColor.RED));
+			return false;
+		}
 		Set<BastionBlock> bastions = Bastion.getBastionManager().getBlockingBastions(player.getLocation());
 		if(!bastions.stream().allMatch(bastion -> bastion.canPlace(player) && bastion.canPlace(targetPlayer))){
 			return false;
@@ -218,7 +207,6 @@ public class OneTimeTeleport extends SimpleHack<OneTimeTeleportConfig> implement
 		if(uuid == null){
 			return false;
 		}
-		//UUID uuid = player.getUniqueId();
 		long timeSince = this.timeSinceGranted.getValue(uuid);
 		if(timeSince == -1L && !this.hasOTT.getValue(uuid)){
 			this.hasOTT.setValue(uuid, true);
@@ -238,14 +226,7 @@ public class OneTimeTeleport extends SimpleHack<OneTimeTeleportConfig> implement
 		if (!config.isEnabled()) {
 			return;
 		}
-
 		this.checkOTT(event.getPlayer().getUniqueId());
-		/*
-		if (event.getPlayer().hasPlayedBefore()) {
-			return;
-		}
-		this.hasOTT.setValue(event.getPlayer().getUniqueId(), true);
-		 */
 	}
 
 	@Override
