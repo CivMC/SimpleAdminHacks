@@ -21,9 +21,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 import vg.civcraft.mc.civmodcore.players.settings.PlayerSettingAPI;
 import vg.civcraft.mc.civmodcore.players.settings.impl.BooleanSetting;
 import vg.civcraft.mc.civmodcore.players.settings.impl.LongSetting;
@@ -222,7 +222,7 @@ public class OneTimeTeleport extends SimpleHack<OneTimeTeleportConfig> implement
 	}
 
 	@EventHandler
-	public void onFirstJoin(PlayerSpawnLocationEvent event) {
+	public void onFirstJoin(PlayerJoinEvent event) {
 		if (!config.isEnabled()) {
 			return;
 		}
