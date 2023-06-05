@@ -186,8 +186,6 @@ public class OneTimeTeleport extends SimpleHack<OneTimeTeleportConfig> implement
 		}
 
 		if (config.getWorldBlacklist().contains(player.getWorld().getName())) {
-			player.sendMessage(Component.text("You cannot teleport out of this world!").color(NamedTextColor.RED));
-			targetPlayer.sendMessage(Component.text(player.getName() + " cannot teleport out of their world!").color(NamedTextColor.RED));
 			return false;
 		}
 		Set<BastionBlock> bastions = Bastion.getBastionManager().getBlockingBastions(player.getLocation());
