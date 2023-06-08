@@ -2,9 +2,7 @@ package com.programmerdan.minecraft.simpleadminhacks.configs;
 
 import com.programmerdan.minecraft.simpleadminhacks.SimpleAdminHacks;
 import com.programmerdan.minecraft.simpleadminhacks.framework.SimpleHackConfig;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import vg.civcraft.mc.civmodcore.config.ConfigHelper;
 
@@ -53,10 +51,7 @@ public class OneTimeTeleportConfig extends SimpleHackConfig {
 		this.worldBlacklist = new ArrayList<>();
 		List<String> worlds = config.getStringList("home_world_blacklist");
 		for (String world : worlds) {
-			World realWorld = Bukkit.getWorld(world);
-			if (realWorld == null) {
-				continue;
-			}
+			plugin().getLogger().info("Adding: " + world + " : world to world blacklist for OTT");
 			this.worldBlacklist.add(world);
 		}
 		this.timelimitOnUsage = ConfigHelper.parseTime(config.getString("ott_timeout", "2d"));
