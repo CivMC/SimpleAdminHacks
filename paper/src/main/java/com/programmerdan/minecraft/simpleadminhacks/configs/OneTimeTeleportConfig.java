@@ -3,6 +3,7 @@ package com.programmerdan.minecraft.simpleadminhacks.configs;
 import com.programmerdan.minecraft.simpleadminhacks.SimpleAdminHacks;
 import com.programmerdan.minecraft.simpleadminhacks.framework.SimpleHackConfig;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import vg.civcraft.mc.civmodcore.config.ConfigHelper;
 
@@ -14,7 +15,7 @@ public class OneTimeTeleportConfig extends SimpleHackConfig {
 
 	private List<Material> materialBlacklist;
 	private List<Material> unsafeMaterials;
-	private List<String> worldBlacklist;
+	private World.Environment badEnvironment;
 	private long timelimitOnUsage;
 
 	public OneTimeTeleportConfig(SimpleAdminHacks plugin,
@@ -48,11 +49,11 @@ public class OneTimeTeleportConfig extends SimpleHackConfig {
 			}
 			materialBlacklist.add(material);
 		}
-		this.worldBlacklist = new ArrayList<>();
-		List<String> worlds = config.getStringList("home_world_blacklist");
-		for (String world : worlds) {
-			plugin().getLogger().info("Adding: " + world + " : world to world blacklist for OTT");
-			this.worldBlacklist.add(world);
+		String worlds = config.getString("blacklisted_environment");
+		try {
+			this.badEnvironment = World.Environment.valueOf(worlds);
+		} catch (IllegalArgumentException exception) {
+			plugin().getLogger().warning("Could not find environment specified in OTT config! Only accept NETHER, THE_END, OVERWORLD or CUSTOM");
 		}
 		this.timelimitOnUsage = ConfigHelper.parseTime(config.getString("ott_timeout", "2d"));
 	}
@@ -65,8 +66,8 @@ public class OneTimeTeleportConfig extends SimpleHackConfig {
 		return Collections.unmodifiableList(unsafeMaterials);
 	}
 
-	public List<String> getWorldBlacklist() {
-		return Collections.unmodifiableList(worldBlacklist);
+	public World.Environment getBlackistedEnvironment() {
+		return badEnvironment;
 	}
 
 	public long getTimelimitOnUsageInMillis() {

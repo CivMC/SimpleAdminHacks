@@ -504,8 +504,8 @@ hacks:
     enabled: true
     material_blacklist: []
     unsafe_materials: [LAVA, WATER]
-    home_world_blacklist:
-      - world_nether
+    #This value prevents tp's into a environment. Only accepts NETHER, THE_END, NORMAL or CUSTOM
+    blacklisted_environment: NETHER
     ott_timeout: 2d
   ToggleLamp:
     enabled: false

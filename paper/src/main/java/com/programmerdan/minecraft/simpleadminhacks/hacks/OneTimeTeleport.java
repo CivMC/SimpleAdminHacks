@@ -185,7 +185,8 @@ public class OneTimeTeleport extends SimpleHack<OneTimeTeleportConfig> implement
 			return false;
 		}
 
-		if (config.getWorldBlacklist().contains(player.getWorld().getName())) {
+		if (config.getBlackistedEnvironment() == player.getWorld().getEnvironment()
+				|| config.getBlackistedEnvironment() == targetPlayer.getWorld().getEnvironment() ) {
 			return false;
 		}
 		Set<BastionBlock> bastions = Bastion.getBastionManager().getBlockingBastions(player.getLocation());
