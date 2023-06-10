@@ -263,7 +263,7 @@ hacks:
     enabled: false
     delay: 10000
     message: '%Victim% was combat tagged by %Attacker%'
-    broadcast: [OP, CONSOLE]
+    broadcast: [ OP, CONSOLE ]
   DisableAI:
     enabled: true
     # Specify below the living entities and their spawning circumstances you want to disable the AI for.
@@ -271,7 +271,7 @@ hacks:
     # NOTE: See https://papermc.io/javadocs/paper/1.16/org/bukkit/event/entity/CreatureSpawnEvent.SpawnReason.html
     # Note: You can also just state "ALL" for all spawn circumstances
     VILLAGER: ALL
-    ENDERMITE: [DISPENSE_EGG, EGG, SPAWNER_EGG]
+    ENDERMITE: [ DISPENSE_EGG, EGG, SPAWNER_EGG ]
   ElytraFeatures:
     enabled: true
     # Whether Elytra flight should be outright disabled
@@ -363,8 +363,8 @@ hacks:
         REDSTONE_COMPARATOR: 4
         OBSERVER: 2
       exempt:
-      - Steve
-      - Alex
+        - Steve
+        - Alex
     daytimeBed:
       enabled: true
       spawnSetMessage: '&7Your spawn has been set.'
@@ -391,7 +391,7 @@ hacks:
     badOmen: false
     #a list of materials players shouldn't be allowed to place at all
     noplace:
-     - DRAGON_EGG
+      - DRAGON_EGG
     rainReduction:
       enabled: false
       rainOccurrenceChance: .5
@@ -439,36 +439,36 @@ hacks:
     enabled: true
     announce: '&f%Player% is brand new!'
     giveIntroKitToRandomSpawners: true
-    broadcast: [PERM, CONSOLE]
+    broadcast: [ PERM, CONSOLE ]
     helptips: on
     helptips_end: 20m
     introkit:
       enabled: true
       contents:
-       - ==: org.bukkit.inventory.ItemStack
-         v: 1
-         type: COOKIE
-         amount: 32
-         meta:
-           ==: ItemMeta
-           meta-type: UNSPECIFIC
-           display-name: 'Manna'
-           lore:
-            - "Gift from the Admins as you"
-            - "begin your journey on Devotion."
-       - ==: org.bukkit.inventory.ItemStack
-         v: 1
-         type: RED_BED
-         amount: 1
-         meta:
-           ==: ItemMeta
-           meta-type: UNSPECIFIC
-           lore:
-            - "This world is unforgiving."
-            - "Be sure to get a good night's"
-            - "rest soon."
+        - ==: org.bukkit.inventory.ItemStack
+          v: 1
+          type: COOKIE
+          amount: 32
+          meta:
+            ==: ItemMeta
+            meta-type: UNSPECIFIC
+            display-name: 'Manna'
+            lore:
+              - "Gift from the Admins as you"
+              - "begin your journey on Devotion."
+        - ==: org.bukkit.inventory.ItemStack
+          v: 1
+          type: RED_BED
+          amount: 1
+          meta:
+            ==: ItemMeta
+            meta-type: UNSPECIFIC
+            lore:
+              - "This world is unforgiving."
+              - "Be sure to get a good night's"
+              - "rest soon."
   ReinforcedChestBreak:
-    enabled: true
+    enabled: false
     # in seconds
     delay: 180
     message: "&4%player% is raiding a chest at %x% %y% %z%."
@@ -508,3 +508,15 @@ hacks:
   ToggleLamp:
     enabled: false
     cooldownTime: 100
+  BetterVehicles:
+    enabled: true
+    return_vehicle_to_inventory_on_exit: true
+    garbage_collect_vehicle: true
+    #"drop_itemstack" or "remove"
+    garbage_collect_vehicle_strategy: drop_itemstack
+    max_vehicle_age_in_seconds: 3
+    # this interval should be no smaller than the max_vehicle_age_in_seconds value. Else vehicles WILL exceed
+    # the preset maximum age
+    gc_interval_in_ticks: 20
+    flush_record_interval_in_ticks: 200
+    persistence_file_path: plugins/SimpleAdminHacks/BetterVehicles.json
