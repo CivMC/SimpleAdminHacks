@@ -513,3 +513,11 @@ hacks:
   ToggleLamp:
     enabled: false
     cooldownTime: 100
+  BuildLimits:
+    enabled: true
+    limits:
+      - ==: com.programmerdan.minecraft.simpleadminhacks.framework.utilities.BuildLimit
+        world: "world_nether"
+        type: "altitude"
+        min_y: -64
+        max_y: 128
