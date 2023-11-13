@@ -38,13 +38,13 @@ public class BuildLimits extends SimpleHack<BuildLimitsConfig> implements Listen
 		Player player = e.getPlayer();
 		Location loc = e.getBlock().getLocation();
 
-		if(!withingLimits(loc)){
+		if(!withinLimits(loc)){
 			e.setCancelled(true);
 			player.sendMessage(Component.text().content("You can not place blocks here").color(NamedTextColor.RED));
 		}
 	}
 
-	private boolean withingLimits(Location loc){
+	private boolean withinLimits(Location loc){
 		BuildLimit[] limits = config.getBuildLimits();
 
 		for (BuildLimit limit : limits){
