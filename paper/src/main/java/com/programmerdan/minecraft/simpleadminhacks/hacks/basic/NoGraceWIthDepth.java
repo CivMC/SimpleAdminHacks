@@ -10,8 +10,8 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
-public final class NoGraceWIthDepth extends BasicHack {
-	public NoGraceWIthDepth(final SimpleAdminHacks plugin, final BasicHackConfig config) {
+public final class NoGraceWithDepth extends BasicHack {
+	public NoGraceWithDepth(final SimpleAdminHacks plugin, final BasicHackConfig config) {
 		super(plugin, config);
 	}
 
