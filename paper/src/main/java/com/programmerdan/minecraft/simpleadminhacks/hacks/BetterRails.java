@@ -4,6 +4,7 @@ package com.programmerdan.minecraft.simpleadminhacks.hacks;
 import com.programmerdan.minecraft.simpleadminhacks.SimpleAdminHacks;
 import com.programmerdan.minecraft.simpleadminhacks.configs.BetterRailsConfig;
 import com.programmerdan.minecraft.simpleadminhacks.framework.SimpleHack;
+import org.bukkit.HeightMap;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -87,20 +88,25 @@ public final class BetterRails extends SimpleHack<BetterRailsConfig> implements 
 		Material belowRail = minecart.getLocation().subtract(0, 1, 0).getBlock().getType();
 		Material belowRail2 = minecart.getLocation().subtract(0, 2, 0).getBlock().getType();
 
-		Double belowRailSpeed = config.getMaxSpeedMetresPerSecond(belowRail);
-		Double belowRail2Speed = config.getMaxSpeedMetresPerSecond(belowRail2);
+		double speedMetresPerSecond = maxOrGet(config.getMaxSpeedMetresPerSecond(belowRail), config.getMaxSpeedMetresPerSecond(belowRail2), config.getBaseSpeed());
 
-		double speedMetresPerSecond;
-		if (belowRailSpeed != null && belowRail2Speed != null) {
-			speedMetresPerSecond = Math.max(belowRailSpeed, belowRail2Speed);
-		} else if (belowRailSpeed != null) {
-			speedMetresPerSecond = belowRailSpeed;
-		} else if (belowRail2Speed != null) {
-			speedMetresPerSecond = belowRail2Speed;
-		} else {
-			speedMetresPerSecond = config.getBaseSpeed();
+		if (minecart.getLocation().getBlockY() == minecart.getWorld().getHighestBlockYAt(minecart.getLocation(), HeightMap.WORLD_SURFACE)) {
+			speedMetresPerSecond += maxOrGet(config.getSkySpeedMetresPerSecond(belowRail), config.getSkySpeedMetresPerSecond(belowRail2), config.getSkySpeed());
 		}
 
+
 		minecart.setMaxSpeed(speedMetresPerSecond * METRES_PER_SECOND_TO_SPEED);
+	}
+
+	private double maxOrGet(Double left, Double right, double defaultAmount) {
+		if (left != null && right != null) {
+			return Math.max(left, right);
+		} else if (left != null) {
+			return left;
+		} else if (right != null) {
+			return right;
+		} else {
+			return defaultAmount;
+		}
 	}
 }
