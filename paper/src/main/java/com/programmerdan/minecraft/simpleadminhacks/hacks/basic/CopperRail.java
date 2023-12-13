@@ -95,7 +95,7 @@ public class CopperRail extends BasicHack {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void on(PlayerInteractEvent event) {
 		if (!this.deoxidise) {
 			return;
