@@ -17,7 +17,7 @@ public final class BetterRailsConfig extends SimpleHackConfig {
 	private double baseSpeed = 8;
 
 	private Map<Material, Double> skySpeeds;
-	private double skySpeed = 8;
+	private double skySpeed = 0;
 
 	public BetterRailsConfig(SimpleAdminHacks plugin, ConfigurationSection base) {
 		super(plugin, base, false);
