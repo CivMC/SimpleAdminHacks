@@ -24,6 +24,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -132,6 +133,29 @@ public class CopperRail extends BasicHack {
 		((CraftItemStack) item).handle.hurtAndBreak(1, player.getHandle(), p -> {
 			p.broadcastBreakEvent(event.getHand() == EquipmentSlot.HAND ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND);
 		});
+
+		event.setCancelled(true);
+	}
+
+	// It's not really fair for copper blocks that are below rails to naturally oxidise,
+	// as it is easy to cheese by placing a waxed copper block every 9 blocks
+	@EventHandler
+	public void on(BlockFormEvent event) {
+		Block block = event.getBlock();
+
+		Optional<net.minecraft.world.level.block.Block> next = WeatheringCopper.getNext(((CraftBlock) block).getNMS().getBlock());
+		if (next.isEmpty()) {
+			return;
+		}
+
+		Block railAbove = block.getRelative(BlockFace.UP);
+		if (!MaterialTags.RAILS.isTagged(railAbove)) {
+			railAbove = railAbove.getRelative(BlockFace.UP);
+		}
+
+		if (!MaterialTags.RAILS.isTagged(railAbove)) {
+			return;
+		}
 
 		event.setCancelled(true);
 	}
