@@ -4,21 +4,6 @@ import com.google.common.collect.Sets;
 import com.programmerdan.minecraft.simpleadminhacks.SimpleAdminHacks;
 import com.programmerdan.minecraft.simpleadminhacks.configs.TimingsHackConfig;
 import com.programmerdan.minecraft.simpleadminhacks.framework.SimpleHack;
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -40,6 +25,14 @@ import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
+import java.lang.ref.WeakReference;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.logging.Level;
 
 /**
  * This crazy hack is focused on filling a gap left by /timings and warmroast and frankly, most
@@ -253,7 +246,7 @@ public class TimingsHack extends SimpleHack<TimingsHackConfig> implements Listen
 				view.getRenderers().forEach(view::removeRenderer);
 				view.addRenderer(this.tickVisualize);
 
-				ItemStack viewMap = new ItemStack(Material.MAP, 1);
+				ItemStack viewMap = new ItemStack(Material.FILLED_MAP, 1);
 
 				MapMeta mapMeta = (MapMeta) viewMap.getItemMeta();
 				mapMeta.setMapView(view);
@@ -301,7 +294,7 @@ public class TimingsHack extends SimpleHack<TimingsHackConfig> implements Listen
 				view.getRenderers().forEach(view::removeRenderer);
 				view.addRenderer(this.bindVisualizers.get(args[0]));
 
-				ItemStack viewMap = new ItemStack(Material.MAP);
+				ItemStack viewMap = new ItemStack(Material.FILLED_MAP);
 
 				MapMeta mapMeta = (MapMeta) viewMap.getItemMeta();
 				mapMeta.setMapView(view);
@@ -358,7 +351,7 @@ public class TimingsHack extends SimpleHack<TimingsHackConfig> implements Listen
 		Player player = event.getPlayer();
 		PlayerInventory inventory = player.getInventory();
 		ItemStack newHeld = inventory.getItem(event.getNewSlot());
-		if (newHeld != null && newHeld.getType().equals(Material.MAP)) {
+		if (newHeld != null && newHeld.getType().equals(Material.FILLED_MAP)) {
 			MapMeta baseMeta = (MapMeta) newHeld.getItemMeta();
 			if (baseMeta.hasLore()) {
 				try {
