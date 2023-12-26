@@ -40,10 +40,10 @@ public final class BuildLimitsConfig extends SimpleHackConfig {
 		}
 	}
 
-	public boolean isEnabled(){
+	public boolean isEnabled() {
 		return this.enabled;
 	}
-	public BuildLimit[] getBuildLimits(){
+	public BuildLimit[] getBuildLimits() {
 		return this.buildLimits;
 	}
 }

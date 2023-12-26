@@ -1,4 +1,4 @@
-package com.programmerdan.minecraft.simpleadminhacks.hacks.basic;
+package com.programmerdan.minecraft.simpleadminhacks.hacks;
 
 import com.programmerdan.minecraft.simpleadminhacks.SimpleAdminHacks;
 import com.programmerdan.minecraft.simpleadminhacks.configs.BuildLimitsConfig;

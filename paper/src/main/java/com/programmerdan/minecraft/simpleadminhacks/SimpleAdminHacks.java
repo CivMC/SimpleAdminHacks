@@ -55,7 +55,7 @@ public class SimpleAdminHacks extends ACivMod {
 		super.onDisable();
 	}
 
-	public void registerSerializations(){
+	public void registerSerializations() {
 		ConfigurationSerialization.registerClass(BuildLimit.class);
 	}
 
