@@ -30,6 +30,8 @@ import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class CopperRail extends BasicHack {
@@ -42,6 +44,8 @@ public class CopperRail extends BasicHack {
 
 	@AutoLoad
 	private double damage;
+
+	private boolean formingBlock = false;
 
 	public CopperRail(SimpleAdminHacks plugin, BasicHackConfig config) {
 		super(plugin, config);
@@ -71,28 +75,49 @@ public class CopperRail extends BasicHack {
 			return;
 		}
 
-		Block copperBlock = minecart.getLocation().getBlock().getRelative(BlockFace.DOWN);
-		Optional<net.minecraft.world.level.block.Block> next = WeatheringCopper.getNext(((CraftBlock) copperBlock).getNMS().getBlock());
-		if (next.isEmpty()) {
-			copperBlock = copperBlock.getRelative(BlockFace.DOWN);
+		int signX = from.getBlockX() > to.getBlockX() ? 1 : -1;
+		int signZ = from.getBlockZ() > to.getBlockZ() ? 1 : -1;
+		boolean firstBlock = true;
+
+		List<Block> copperBlocks = new ArrayList<>(4);
+		for (int x = to.getBlockX(); x != to.getBlockX() + (from.getBlockX() - to.getBlockX()) + signX; x += signX) {
+			for (int z = to.getBlockZ(); z != to.getBlockZ() + (from.getBlockZ() - to.getBlockZ()) + signZ; z += signZ) {
+				if (firstBlock) {
+					firstBlock = false;
+					continue;
+				}
+				Location location = new Location(minecart.getWorld(), x, from.getY(), z);
+				Block topCopperBlock = location.getBlock().getRelative(BlockFace.DOWN);
+				Optional<net.minecraft.world.level.block.Block> next = WeatheringCopper.getNext(((CraftBlock) topCopperBlock).getNMS().getBlock());
+				if (next.isPresent()) {
+					copperBlocks.add(topCopperBlock);
+				}
+				Block belowCopperBlock = topCopperBlock.getRelative(BlockFace.DOWN);
+				next = WeatheringCopper.getNext(((CraftBlock) belowCopperBlock).getNMS().getBlock());
+				if (next.isPresent()) {
+					copperBlocks.add(belowCopperBlock);
+				}
+			}
 		}
 
-		next = WeatheringCopper.getNext(((CraftBlock) copperBlock).getNMS().getBlock());
-		if (next.isEmpty()) {
-			return;
-		}
-
-		CraftBlock craftBlock = (CraftBlock) copperBlock;
-		BlockState state = craftBlock.getNMS();
-		ServerLevel level = ((CraftWorld) copperBlock.getWorld()).getHandle();
-		// We damage the copper directly instead of using random ticking, as random ticking is easy to cheese
-		// by placing waxed copper next to the rail, entirely preventing the rest of the rail from oxidising.
-		WeatheringCopper copper = (WeatheringCopper) state.getBlock();
-		float chanceModifier = copper.getChanceModifier();
-		if (this.damage * chanceModifier > this.randomTickRandom.nextFloat()) {
-			copper.getNext(state).ifPresent((iblockdata2) -> {
-				CraftEventFactory.handleBlockFormEvent(level, craftBlock.getPosition(), iblockdata2);
-			});
+		for (Block copperBlock : copperBlocks) {
+			CraftBlock craftBlock = (CraftBlock) copperBlock;
+			BlockState state = craftBlock.getNMS();
+			ServerLevel level = ((CraftWorld) copperBlock.getWorld()).getHandle();
+			// We damage the copper directly instead of using random ticking, as random ticking is easy to cheese
+			// by placing waxed copper next to the rail, entirely preventing the rest of the rail from oxidising.
+			WeatheringCopper copper = (WeatheringCopper) state.getBlock();
+			float chanceModifier = copper.getChanceModifier();
+			if (this.damage * chanceModifier > this.randomTickRandom.nextFloat()) {
+				copper.getNext(state).ifPresent((iblockdata2) -> {
+					try {
+						formingBlock = true;
+						CraftEventFactory.handleBlockFormEvent(level, craftBlock.getPosition(), iblockdata2);
+					} finally {
+						formingBlock = false;
+					}
+				});
+			}
 		}
 	}
 
@@ -141,6 +166,10 @@ public class CopperRail extends BasicHack {
 	// as it is easy to cheese by placing a waxed copper block every 9 blocks
 	@EventHandler
 	public void on(BlockFormEvent event) {
+		if (formingBlock) {
+			return;
+		}
+
 		Block block = event.getBlock();
 
 		Optional<net.minecraft.world.level.block.Block> next = WeatheringCopper.getNext(((CraftBlock) block).getNMS().getBlock());
