@@ -517,7 +517,7 @@ hacks:
     enabled: true
     # All in metres per second
     # Minecraft will prevent you going faster than 30m/s
-    base: 12
+    base: 11
     materials:
       COBBLESTONE: 8
       COPPER_BLOCK: 29
